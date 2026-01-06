@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-soft" style="background:linear-gradient(90deg, rgba(11,18,32,0.9), rgba(7,26,47,0.9));">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">修仙世界</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">主页</a></li>
+                    <li class="nav-item"><a class="nav-link" href="treasure.html">法宝</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="app-wrap container mt-4">
+    <title>法宝 - 修仙游戏</title>
+    <link rel="stylesheet" href="static/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <div id="treasure-list">
+            <h3>法宝列表</h3>
+            <ul id="treasure-ul" class="list-group"></ul>
+            <button class="btn btn-info" onclick="forgeTreasure()">锻造法宝</button>
+            <a href="#home" class="btn btn-secondary">返回主页</a>
+        </div>
+        <!-- 法宝详情模态框 -->
+        <div class="modal fade" id="treasureDetailModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="treasureDetailTitle">法宝详情</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="treasureDetailBody"></div>
+                        <div id="treasureEstimate" class="mt-2 mb-2"></div>
+                        <div class="row mt-1">
+                            <div class="col-md-6">
+                                <label class="form-label">材料品质系数</label>
+                                <input id="treasureMaterialInput" class="form-control" value="1.0" />
+                            </div>
+                            <div class="col-md-6 d-flex align-items-end">
+                                <button id="treasureAwakenBtn" class="btn btn-warning me-2">觉醒</button>
+                                <button id="treasureRecastBtn" class="btn btn-danger">重铸</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

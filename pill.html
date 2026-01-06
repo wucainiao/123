@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-soft" style="background:linear-gradient(90deg, rgba(11,18,32,0.9), rgba(7,26,47,0.9));">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">修仙世界</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">主页</a></li>
+                    <li class="nav-item"><a class="nav-link" href="pill.html">丹药</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="app-wrap container mt-4">
+    <title>炼丹系统 - 修仙游戏</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-warning text-white">
+                        <h4 class="mb-0">丹药列表</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="pill-list" class="row g-3">
+                            <!-- 丹药卡片将在这里动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">炼丹操作</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success" onclick="showRefinePillModal()">
+                                <i class="fas fa-flask"></i> 开始炼丹
+                            </button>
+                            <button class="btn btn-info" onclick="showUsePillModal()">
+                                <i class="fas fa-pills"></i> 使用丹药
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 炼丹炉信息 -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="mb-0">炼丹炉</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="furnace-info">
+                            <!-- 炼丹炉信息将在这里显示 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 炼丹模态框 -->
+    <div class="modal fade" id="refinePillModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">炼制丹药</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">选择丹药</label>
+                        <select class="form-control" id="refinePillSelect">
+                            <option value="">请选择要炼制的丹药</option>
+                        </select>
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>炼制消耗：</strong>难度 × 100 灵石<br>
+                        <small>成功率受材料品质和炼丹炉等级影响</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="refinePill()">开始炼制</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 使用丹药模态框 -->
+    <div class="modal fade" id="usePillModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">使用丹药</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">选择丹药</label>
+                        <select class="form-control" id="usePillSelect">
+                            <option value="">请选择要使用的丹药</option>
+                        </select>
+                    </div>
+                    <div id="pill-effect-info" class="alert alert-light">
+                        <!-- 丹药效果信息将在这里显示 -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-success" onclick="usePill()">使用丹药</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 获取认证令牌
+        function getToken() {
+            return localStorage.getItem('token');
+        }
+
+        // API调用函数
+        async function apiCall(endpoint, options = {}) {
+            const token = getToken();
+            if (!token) {
+                alert('请先登录');
+                return null;
+            }
+
+            const defaultOptions = {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            const response = await fetch(endpoint, { ...defaultOptions, ...options });
+            if (response.status === 401) {
+                alert('认证失败，请重新登录');
+                return null;
+            }
+            return response.json();
+        }
+
+        // 显示丹药列表
+        async function showPills() {
+            const data = await apiCall('/pill');
+            if (!data) return;
+
+            const pillList = document.getElementById('pill-list');
+            pillList.innerHTML = '';
+
+            data.pills.forEach(pill => {
+                const card = document.createElement('div');
+                card.className = 'col-md-4 mb-3';
+                card.innerHTML = `
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">${pill.name}</h5>
+                            <p class="card-text">
+                                <span class="badge bg-${getQualityColor(pill.quality)}">${pill.quality}</span>
+                                等级: ${pill.level}<br>
+                                效果: ${pill.effect_type} +${pill.effect_value}<br>
+                                成功率: ${(pill.success_rate * 100).toFixed(1)}%<br>
+                                难度: ${pill.difficulty}
+                            </p>
+                            <button class="btn btn-primary" onclick="selectPill(${pill.id}, '${pill.name}')">
+                                炼制
+                            </button>
+                        </div>
+                    </div>
+                `;
+                pillList.appendChild(card);
+            });
+        }
+
+        // 获取品质颜色
+        function getQualityColor(quality) {
+            const colors = {
+                '凡品': 'secondary',
+                '黄品': 'warning',
+                '玄品': 'info',
+                '地品': 'success',
+                '天品': 'primary',
+                '无上': 'danger'
+            };
+            return colors[quality] || 'secondary';
+        }
+
+        // 选择丹药
+        function selectPill(pillId, pillName) {
+            document.getElementById('refinePillSelect').value = pillId;
+            document.getElementById('refinePillModalLabel').textContent = `炼制 ${pillName}`;
+            const modal = new bootstrap.Modal(document.getElementById('refinePillModal'));
+            modal.show();
+        }
+
+        // 显示炼丹模态框
+        function showRefinePillModal() {
+            showPills(); // 刷新丹药列表
+            const modal = new bootstrap.Modal(document.getElementById('refinePillModal'));
+            modal.show();
+        }
+
+        // 显示使用丹药模态框
+        async function showUsePillModal() {
+            // 获取玩家拥有的丹药
+            const data = await apiCall('/character/inventory/pills'); // 需要添加这个API
+            if (!data) return;
+
+            const select = document.getElementById('usePillSelect');
+            select.innerHTML = '<option value="">请选择要使用的丹药</option>';
+
+            data.pills.forEach(pill => {
+                const option = document.createElement('option');
+                option.value = pill.id;
+                option.textContent = `${pill.name} (数量: ${pill.quantity})`;
+                select.appendChild(option);
+            });
+
+            const modal = new bootstrap.Modal(document.getElementById('usePillModal'));
+            modal.show();
+        }
+
+        // 炼制丹药
+        async function refinePill() {
+            const pillId = document.getElementById('refinePillSelect').value;
+            if (!pillId) {
+                alert('请选择要炼制的丹药');
+                return;
+            }
+
+            const result = await apiCall(`/pill/refine/${pillId}`, { method: 'POST' });
+            if (result) {
+                alert(result.message);
+                if (result.message.includes('成功')) {
+                    bootstrap.Modal.getInstance(document.getElementById('refinePillModal')).hide();
+                }
+            }
+        }
+
+        // 使用丹药
+        async function usePill() {
+            const pillId = document.getElementById('usePillSelect').value;
+            if (!pillId) {
+                alert('请选择要使用的丹药');
+                return;
+            }
+
+            const result = await apiCall(`/pill/use/${pillId}`, { method: 'POST' });
+            if (result) {
+                alert(result.message);
+                if (result.message.includes('成功')) {
+                    bootstrap.Modal.getInstance(document.getElementById('usePillModal')).hide();
+                }
+            }
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            showPills();
+        });
+    </script>
+</body>
+</html>

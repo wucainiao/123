@@ -1,0 +1,82 @@
+/* 全局样式 - 改善界面配色与排版 */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;600;700&display=swap');
+
+:root{
+    --bg:#0f1724;
+    --card:#0b1220;
+    --muted:#aab4c2;
+    --accent:#6ee7b7;
+    --primary:#3b82f6;
+    --glass: rgba(255,255,255,0.03);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%;}
+body{
+    font-family: 'Noto Sans SC', system-ui, -apple-system, "Segoe UI", Roboto, 'Helvetica Neue', Arial;
+    background: linear-gradient(180deg, #071029 0%, #071a2f 60%);
+    color:#e6eef8;
+    margin:0;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+}
+
+.container{max-width:1100px}
+
+/* 卡片风格 */
+.card{
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.04));
+    border: 1px solid rgba(255,255,255,0.04);
+    box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+}
+.card-header{background:transparent;border-bottom:1px solid rgba(255,255,255,0.03)}
+
+/* 导航 */
+.navbar-brand{font-weight:700;letter-spacing:0.6px}
+.navbar-dark .navbar-nav .nav-link{color:var(--muted)}
+.navbar-dark .navbar-nav .nav-link:hover{color:var(--accent)}
+
+/* 按钮调整 */
+.btn{border-radius:6px}
+.btn-primary{background:var(--primary);border-color:transparent}
+.btn-success{background:linear-gradient(90deg,#10b981,#34d399);border-color:transparent}
+
+/* 全局标题 */
+h1,h2,h3,h4,h5{color:#eaf6ff}
+
+/* loading 居中 */
+.loading-center{display:flex;align-items:center;justify-content:center;min-height:120px}
+
+/* 小屏幕优化 */
+@media (max-width:576px){
+    .container{padding:1rem}
+    .navbar-brand{font-size:1rem}
+}
+
+/* 表单和输入 */
+.form-control{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+.form-control:focus{box-shadow:none;border-color:var(--primary);background:rgba(255,255,255,0.03)}
+
+/* 页脚 */
+.app-footer{padding:18px 0;color:var(--muted);font-size:0.9rem;text-align:center;border-top:1px solid rgba(255,255,255,0.02);margin-top:36px}
+
+/* 小修饰 */
+.muted{color:var(--muted)}
+
+/* Content wrapper to add breathing room */
+.app-wrap{padding-top:22px;padding-bottom:40px}
+
+/* Utility */
+.shadow-soft{box-shadow:0 4px 14px rgba(2,6,23,0.55)}
+
+/* Improve tables */
+table.table{background:transparent}
+
+/* Links */
+a{color:var(--accent)}
+a:hover{text-decoration:underline}
+
+/* small badges */
+.badge-soft{background:rgba(255,255,255,0.03);color:var(--muted)}
+
+/* End */

@@ -1,0 +1,83 @@
+openapi: 3.0.0
+info:
+  title: 修仙游戏 API
+  version: 1.0.0
+paths:
+  /register:
+    post:
+      summary: 用户注册
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                email:
+                  type: string
+      responses:
+        '201':
+          description: 注册成功
+  /login:
+    post:
+      summary: 用户登录
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: 登录成功，返回 token
+  /character:
+    get:
+      summary: 获取人物信息
+      responses:
+        '200':
+          description: 人物信息
+    post:
+      summary: 创建人物
+      responses:
+        '201':
+          description: 创建成功
+  /character/levelup:
+    post:
+      summary: 人物升级
+      responses:
+        '200':
+          description: 升级成功
+  /equipment:
+    get:
+      summary: 获取装备列表
+  /treasure:
+    get:
+      summary: 获取法宝列表
+    post:
+      summary: 锻造法宝
+  /mantra:
+    get:
+      summary: 获取功法列表
+  /meridian:
+    get:
+      summary: 获取经脉信息
+  /pet:
+    get:
+      summary: 获取宠物列表
+tags:
+  - name: auth
+  - name: character
+  - name: equipment
+  - name: treasure
+  - name: mantra
+  - name: meridian
+  - name: pet

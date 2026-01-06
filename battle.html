@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-soft" style="background:linear-gradient(90deg, rgba(11,18,32,0.9), rgba(7,26,47,0.9));">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">修仙世界</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">主页</a></li>
+                    <li class="nav-item"><a class="nav-link" href="home.html">游戏</a></li>
+                    <li class="nav-item"><a class="nav-link" href="battle.html">战斗</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="app-wrap container mt-4">
+    <title>战斗 - 修仙游戏</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .battle-field {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 400px;
+            position: relative;
+        }
+        .character-side {
+            position: absolute;
+            left: 50px;
+            bottom: 50px;
+        }
+        .monster-side {
+            position: absolute;
+            right: 50px;
+            bottom: 50px;
+        }
+        .battle-character, .battle-monster {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .hp-bar {
+            width: 100%;
+            height: 20px;
+            background: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+        .hp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            transition: width 0.3s ease;
+        }
+        .battle-log {
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .action-buttons {
+            margin-top: 20px;
+        }
+        .weather-display {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.9);
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        .element-display {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.9);
+            padding: 10px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div id="battle-selection" class="card">
+            <div class="card-header">
+                <h4>选择战斗方式</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>单人战斗</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>选择怪物进行战斗</p>
+                                <select id="monster-select" class="form-control mb-3">
+                                    <option value="">选择怪物</option>
+                                </select>
+                                <button class="btn btn-danger" onclick="startMonsterCombat()">开始战斗</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>副本挑战</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>挑战副本，获得丰厚奖励</p>
+                                <select id="dungeon-select" class="form-control mb-3">
+                                    <option value="">选择副本</option>
+                                </select>
+                                <button class="btn btn-warning" onclick="startDungeonCombat()">进入副本</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="battle-area" class="card" style="display: none;">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4>战斗中</h4>
+                <button class="btn btn-secondary" onclick="endCombat()">结束战斗</button>
+            </div>
+            <div class="card-body">
+                <div class="battle-field">
+                    <div class="weather-display" id="weather-display">天气: 晴天</div>
+                    <div class="element-display" id="element-display">元素克制: 无</div>
+
+                    <div class="character-side">
+                        <div class="battle-character">
+                            <h5 id="character-name">角色</h5>
+                            <div class="hp-bar">
+                                <div class="hp-fill" id="character-hp-fill" style="width: 100%;"></div>
+                            </div>
+                            <small id="character-hp-text">HP: 100/100</small>
+                        </div>
+                    </div>
+
+                    <div class="monster-side">
+                        <div class="battle-monster">
+                            <h5 id="monster-name">怪物</h5>
+                            <div class="hp-bar">
+                                <div class="hp-fill" id="monster-hp-fill" style="width: 100%;"></div>
+                            </div>
+                            <small id="monster-hp-text">HP: 100/100</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="battle-log" id="battle-log">
+                    <!-- 战斗日志将在这里显示 -->
+                </div>
+
+                <div class="action-buttons text-center">
+                    <button class="btn btn-primary me-2" onclick="performAction('attack')">普通攻击</button>
+                    <button class="btn btn-info me-2" onclick="performAction('defend')">防御</button>
+                    <button class="btn btn-success me-2" onclick="showSkillModal()">使用技能</button>
+                    <button class="btn btn-warning" onclick="performAction('flee')">逃跑</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="battle-result" class="alert" style="display: none;" role="alert">
+            <!-- 战斗结果将在这里显示 -->
+        </div>
+    </div>
+
+    <!-- 技能选择模态框 -->
+    <div class="modal fade" id="skillModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">选择技能</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="pet-skills">
+                        <!-- 宠物技能将在这里显示 -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentCombatId = null;
+        let currentCombatState = null;
+
+        // 获取认证令牌
+        function getToken() {
+            return localStorage.getItem('token');
+        }
+
+        // API调用函数
+        async function apiCall(endpoint, options = {}) {
+            const token = getToken();
+            if (!token) {
+                alert('请先登录');
+                return null;
+            }
+
+            const defaultOptions = {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            const response = await fetch(endpoint, { ...defaultOptions, ...options });
+            if (response.status === 401) {
+                alert('认证失败，请重新登录');
+                return null;
+            }
+            return response.json();
+        }
+
+        // 加载怪物和副本列表
+        async function loadCombatOptions() {
+            // 加载怪物列表
+            const monsterData = await apiCall('/monsters');
+            if (monsterData) {
+                const monsterSelect = document.getElementById('monster-select');
+                monsterData.monsters.forEach(monster => {
+                    const option = document.createElement('option');
+                    option.value = monster.id;
+                    option.textContent = `${monster.name} (Lv.${monster.level})`;
+                    monsterSelect.appendChild(option);
+                });
+            }
+
+            // 加载副本列表
+            const dungeonData = await apiCall('/dungeons');
+            if (dungeonData) {
+                const dungeonSelect = document.getElementById('dungeon-select');
+                dungeonData.dungeons.forEach(dungeon => {
+                    const option = document.createElement('option');
+                    option.value = dungeon.id;
+                    option.textContent = `${dungeon.name} (${dungeon.difficulty})`;
+                    dungeonSelect.appendChild(option);
+                });
+            }
+        }
+
+        // 开始怪物战斗
+        async function startMonsterCombat() {
+            const monsterId = document.getElementById('monster-select').value;
+            if (!monsterId) {
+                alert('请选择怪物');
+                return;
+            }
+
+            const result = await apiCall('/combat/start', {
+                method: 'POST',
+                body: JSON.stringify({
+                    type: 'monster',
+                    monster_id: parseInt(monsterId)
+                })
+            });
+
+            if (result && result.combat_id) {
+                currentCombatId = result.combat_id;
+                currentCombatState = result;
+                showBattleInterface(result);
+            }
+        }
+
+        // 开始副本战斗
+        async function startDungeonCombat() {
+            const dungeonId = document.getElementById('dungeon-select').value;
+            if (!dungeonId) {
+                alert('请选择副本');
+                return;
+            }
+
+            const result = await apiCall('/combat/start', {
+                method: 'POST',
+                body: JSON.stringify({
+                    type: 'dungeon',
+                    dungeon_id: parseInt(dungeonId)
+                })
+            });
+
+            if (result && result.combat_id) {
+                currentCombatId = result.combat_id;
+                currentCombatState = result;
+                showBattleInterface(result);
+            }
+        }
+
+        // 显示战斗界面
+        function showBattleInterface(combatData) {
+            document.getElementById('battle-selection').style.display = 'none';
+            document.getElementById('battle-area').style.display = 'block';
+            document.getElementById('battle-result').style.display = 'none';
+
+            // 更新界面元素
+            document.getElementById('character-name').textContent = '你的角色';
+            document.getElementById('monster-name').textContent = combatData.monster.name;
+            document.getElementById('weather-display').textContent = `天气: ${combatData.weather}`;
+
+            updateHPBars(combatData.character_hp, combatData.character_hp, combatData.monster.hp, combatData.monster.hp);
+
+            // 显示元素克制信息
+            const elementInfo = getElementRestraintInfo('你的灵根', combatData.monster.linggen);
+            document.getElementById('element-display').innerHTML = `元素克制: ${elementInfo}`;
+
+            // 清空战斗日志
+            document.getElementById('battle-log').innerHTML = '<div>战斗开始！</div>';
+        }
+
+        // 更新HP条
+        function updateHPBars(charCurrent, charMax, monsterCurrent, monsterMax) {
+            const charPercent = (charCurrent / charMax) * 100;
+            const monsterPercent = (monsterCurrent / monsterMax) * 100;
+
+            document.getElementById('character-hp-fill').style.width = `${Math.max(0, charPercent)}%`;
+            document.getElementById('monster-hp-fill').style.width = `${Math.max(0, monsterPercent)}%`;
+
+            document.getElementById('character-hp-text').textContent = `HP: ${Math.max(0, charCurrent)}/${charMax}`;
+            document.getElementById('monster-hp-text').textContent = `HP: ${Math.max(0, monsterCurrent)}/${monsterMax}`;
+        }
+
+        // 执行战斗行动
+        async function performAction(actionType, extraData = {}) {
+            if (!currentCombatId) return;
+
+            const result = await apiCall(`/combat/${currentCombatId}/action`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: actionType,
+                    ...extraData
+                })
+            });
+
+            if (result) {
+                // 更新战斗状态
+                currentCombatState.character_hp = result.character_hp;
+                currentCombatState.monster_hp = result.monster_hp;
+
+                updateHPBars(result.character_hp, result.character_hp, result.monster_hp, result.monster_hp);
+
+                // 添加战斗日志
+                const logContainer = document.getElementById('battle-log');
+                result.log.forEach(logEntry => {
+                    const logDiv = document.createElement('div');
+                    logDiv.textContent = logEntry;
+                    logContainer.appendChild(logDiv);
+                });
+                logContainer.scrollTop = logContainer.scrollHeight;
+
+                // 检查战斗结果
+                if (result.result) {
+                    showBattleResult(result.result);
+                }
+            }
+        }
+
+        // 显示技能模态框
+        async function showSkillModal() {
+            const petData = await apiCall('/pet');
+            if (petData) {
+                const petSkillsDiv = document.getElementById('pet-skills');
+                petSkillsDiv.innerHTML = '';
+
+                petData.forEach(pet => {
+                    const petCard = document.createElement('div');
+                    petCard.className = 'card mb-2';
+                    petCard.innerHTML = `
+                        <div class="card-body">
+                            <h6>${pet.name}</h6>
+                            <p>技能: ${pet.skill_name}</p>
+                            <p>触发率: ${(pet.skill_trigger_rate * 100).toFixed(1)}%</p>
+                            <button class="btn btn-sm btn-success" onclick="performAction('skill', {pet_id: ${pet.id}})">
+                                使用技能
+                            </button>
+                        </div>
+                    `;
+                    petSkillsDiv.appendChild(petCard);
+                });
+            }
+
+            const modal = new bootstrap.Modal(document.getElementById('skillModal'));
+            modal.show();
+        }
+
+        // 显示战斗结果
+        function showBattleResult(result) {
+            const resultDiv = document.getElementById('battle-result');
+            resultDiv.style.display = 'block';
+
+            if (result === 'victory') {
+                resultDiv.className = 'alert alert-success';
+                resultDiv.innerHTML = '<h4>战斗胜利！</h4><p>获得经验和奖励！</p>';
+            } else if (result === 'defeat') {
+                resultDiv.className = 'alert alert-danger';
+                resultDiv.innerHTML = '<h4>战斗失败！</h4><p>下次继续努力！</p>';
+            }
+
+            // 禁用行动按钮
+            document.querySelectorAll('.action-buttons button').forEach(btn => {
+                btn.disabled = true;
+            });
+        }
+
+        // 结束战斗
+        async function endCombat() {
+            if (currentCombatId) {
+                await apiCall(`/combat/${currentCombatId}/end`, { method: 'POST' });
+            }
+
+            document.getElementById('battle-area').style.display = 'none';
+            document.getElementById('battle-selection').style.display = 'block';
+            document.getElementById('battle-result').style.display = 'none';
+
+            currentCombatId = null;
+            currentCombatState = null;
+        }
+
+        // 获取元素克制信息
+        function getElementRestraintInfo(attackerLinggen, defenderLinggen) {
+            if (attackerLinggen === '无' || defenderLinggen === '无') {
+                return '无克制';
+            }
+
+            const restraints = {
+                '金': {'克制': '木', '被克制': '火'},
+                '木': {'克制': '土', '被克制': '金'},
+                '水': {'克制': '火', '被克制': '土'},
+                '火': {'克制': '金', '被克制': '水'},
+                '土': {'克制': '水', '被克制': '木'}
+            };
+
+            const attackerInfo = restraints[attackerLinggen] || {};
+            const defenderInfo = restraints[defenderLinggen] || {};
+
+            if (attackerInfo.克制 === defenderLinggen) {
+                return `${attackerLinggen}克制${defenderLinggen}`;
+            } else if (defenderInfo.克制 === attackerLinggen) {
+                return `${defenderLinggen}克制${attackerLinggen}`;
+            } else {
+                return '势均力敌';
+            }
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCombatOptions();
+        });
+    </script>
+</body>
+</html>

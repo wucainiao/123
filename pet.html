@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-soft" style="background:linear-gradient(90deg, rgba(11,18,32,0.9), rgba(7,26,47,0.9));">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">修仙世界</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">主页</a></li>
+                    <li class="nav-item"><a class="nav-link" href="pet.html">灵兽</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="app-wrap container mt-4">
+    <title>宠物 - 修仙游戏</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-warning text-white">
+                        <h4 class="mb-0">我的宠物</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="pet-list" class="row g-3">
+                            <!-- 宠物卡片将在这里动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">宠物详情</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="pet-detail">
+                            <p class="text-muted">点击宠物查看详情</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="mb-0">宠物操作</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success" onclick="feedPet()">
+                                <i class="fas fa-utensils"></i> 喂养宠物
+                            </button>
+                            <button class="btn btn-info" onclick="playWithPet()">
+                                <i class="fas fa-heart"></i> 陪伴宠物
+                            </button>
+                            <button class="btn btn-danger" onclick="petBattle()">
+                                <i class="fas fa-sword"></i> 宠物战斗
+                            </button>
+                            <button class="btn btn-primary" onclick="usePetSkill()">
+                                <i class="fas fa-magic"></i> 使用技能
+                            </button>
+                            <button class="btn btn-secondary" onclick="showPetMarket()">
+                                <i class="fas fa-store"></i> 宠物市场
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="mb-0">捕捉宠物</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid">
+                            <button class="btn btn-warning" onclick="capturePet()">
+                                <i class="fas fa-search"></i> 捕捉野生宠物
+                            </button>
+                        </div>
+                        <small class="text-muted mt-2 d-block">
+                            捕捉消耗500灵石，成功率取决于运气
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 宠物详情模态框 -->
+    <div class="modal fade" id="petModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="petModalTitle">宠物详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="petModalBody">
+                    <!-- 宠物详情内容 -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" id="levelupPetBtn" onclick="levelupPet()">升级宠物</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 宠物市场模态框 -->
+    <div class="modal fade" id="petMarketModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">宠物市场</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="pet-market-list" class="row g-3">
+                        <!-- 市场宠物将在这里动态生成 -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

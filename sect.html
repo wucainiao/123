@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-soft" style="background:linear-gradient(90deg, rgba(11,18,32,0.9), rgba(7,26,47,0.9));">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">修仙世界</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">主页</a></li>
+                    <li class="nav-item"><a class="nav-link" href="sect.html">宗门</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="app-wrap container mt-4">
+    <title>宗门 - 修仙游戏</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h4 class="mb-0">宗门列表</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="sect-list" class="row g-3">
+                            <!-- 宗门卡片将在这里动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">宗门操作</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary" onclick="showCreateSectModal()">
+                                <i class="fas fa-plus"></i> 创建宗门
+                            </button>
+                            <button class="btn btn-success" onclick="showMySect()">
+                                <i class="fas fa-home"></i> 我的宗门
+                            </button>
+                            <button class="btn btn-warning" onclick="contributeToSect()">
+                                <i class="fas fa-coins"></i> 贡献资源
+                            </button>
+                            <a href="#home" class="btn btn-secondary">
+                                <i class="fas fa-home"></i> 返回主页
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 我的宗门信息 -->
+                <div class="card mt-3" id="my-sect-card" style="display: none;">
+                    <div class="card-header">
+                        <h5 class="mb-0">我的宗门</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="my-sect-info">
+                            <!-- 我的宗门信息将在这里显示 -->
+                        </div>
+                        <div class="mt-3 d-grid gap-2">
+                            <button class="btn btn-info btn-sm" onclick="upgradeSect()">
+                                <i class="fas fa-level-up-alt"></i> 升级宗门
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="manageSect()">
+                                <i class="fas fa-cog"></i> 管理宗门
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 创建宗门模态框 -->
+    <div class="modal fade" id="createSectModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">创建宗门</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createSectForm">
+                        <div class="mb-3">
+                            <label class="form-label">宗门名称</label>
+                            <input type="text" class="form-control" id="sectName" required placeholder="输入宗门名称">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">宗门简介</label>
+                            <textarea class="form-control" id="sectDescription" rows="3" placeholder="介绍一下你的宗门"></textarea>
+                        </div>
+                        <div class="alert alert-info">
+                            <strong>创建消耗：</strong>10,000 灵石<br>
+                            <small>创建后你将成为宗主</small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="createSect()">创建宗门</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 宗门详情模态框 -->
+    <div class="modal fade" id="sectDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sectDetailTitle">宗门详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="sectDetailBody">
+                    <!-- 宗门详情内容 -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-success" id="joinSectBtn" onclick="joinSect()">加入宗门</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-soft" style="background:linear-gradient(90deg, rgba(11,18,32,0.9), rgba(7,26,47,0.9));">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">修仙世界</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">主页</a></li>
+                    <li class="nav-item"><a class="nav-link" href="home.html">游戏</a></li>
+                    <li class="nav-item"><a class="nav-link" href="crafting.html">锻造</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="app-wrap container mt-4">
+            <div id="game-content">
+    <link rel="stylesheet" href="static/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .crafting-workshop {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 600px;
+        }
+        .skill-panel {
+            background: rgba(255,255,255,0.9);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .skill-progress {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+        .skill-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            transition: width 0.3s ease;
+        }
+        .crafting-result {
+            background: rgba(255,255,255,0.95);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .material-item {
+            display: inline-block;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 8px 12px;
+            margin: 2px;
+            font-size: 0.9em;
+        }
+        .material-item.rare {
+            border-color: #ffc107;
+            background: #fff3cd;
+        }
+        .material-item.epic {
+            border-color: #e83e8c;
+            background: #f8d7da;
+        }
+        .material-item.legendary {
+            border-color: #6f42c1;
+            background: #e2d9f3;
+        }
+        .crafting-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .crafting-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .crafting-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .success-rate-display {
+            background: linear-gradient(90deg, #28a745, #ffc107, #dc3545);
+            border-radius: 20px;
+            padding: 2px;
+            margin: 10px 0;
+        }
+        .success-rate-fill {
+            height: 16px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.9);
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-4">
+                <!-- 生活技能面板 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5>生活技能</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="life-skills-list">
+                            <!-- 技能列表将在这里动态生成 -->
+                        </div>
+                        <button class="btn btn-primary w-100 mt-3" onclick="initLifeSkills()">
+                            初始化生活技能
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 材料库存 -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5>材料库存</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="materials-inventory" style="max-height: 300px; overflow-y: auto;">
+                            <!-- 材料库存将在这里显示 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <!-- 锻造工作台 -->
+                <div class="crafting-workshop">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="skill-panel">
+                                <h6>锻造装备</h6>
+                                <div class="mb-3">
+                                    <label class="form-label">选择装备类型</label>
+                                    <select class="form-control" id="equipment-type">
+                                        <option value="武器">武器</option>
+                                        <option value="头盔">头盔</option>
+                                        <option value="衣服">衣服</option>
+                                        <option value="项链">项链</option>
+                                        <option value="戒指">戒指</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">装备品质</label>
+                                    <select class="form-control" id="equipment-quality">
+                                        <option value="黄阶">黄阶</option>
+                                        <option value="玄阶">玄阶</option>
+                                        <option value="地阶">地阶</option>
+                                        <option value="天阶">天阶</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">材料品质系数</label>
+                                    <input type="number" class="form-control" id="forge-material-quality" value="1.0" step="0.1" min="1.0" max="2.0">
+                                </div>
+                                <button class="btn btn-primary w-100" onclick="calculateForgeSuccess()">计算成功率</button>
+                                <div class="success-rate-display mt-2" id="forge-success-display" style="display: none;">
+                                    <div class="success-rate-fill" id="forge-success-fill" style="width: 50%;"></div>
+                                </div>
+                                <small id="forge-success-text" class="text-muted"></small>
+                                <button class="crafting-button w-100 mt-2" onclick="forgeEquipment()" id="forge-button" disabled>
+                                    开始锻造
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="skill-panel">
+                                <h6>制作符文</h6>
+                                <div class="mb-3">
+                                    <label class="form-label">符文名称</label>
+                                    <input type="text" class="form-control" id="rune-name" placeholder="输入符文名称">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">属性类型</label>
+                                    <select class="form-control" id="rune-attribute">
+                                        <option value="attack">攻击力</option>
+                                        <option value="defense">防御力</option>
+                                        <option value="hp">生命值</option>
+                                        <option value="speed">速度</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">属性值</label>
+                                    <input type="number" class="form-control" id="rune-value" value="5" min="1" max="20">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">符文品质</label>
+                                    <select class="form-control" id="rune-quality">
+                                        <option value="普通">普通</option>
+                                        <option value="优质">优质</option>
+                                        <option value="极品">极品</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">材料品质系数</label>
+                                    <input type="number" class="form-control" id="rune-material-quality" value="1.0" step="0.1" min="1.0" max="2.0">
+                                </div>
+                                <button class="btn btn-primary w-100" onclick="calculateRuneSuccess()">计算成功率</button>
+                                <div class="success-rate-display mt-2" id="rune-success-display" style="display: none;">
+                                    <div class="success-rate-fill" id="rune-success-fill" style="width: 50%;"></div>
+                                </div>
+                                <small id="rune-success-text" class="text-muted"></small>
+                                <button class="crafting-button w-100 mt-2" onclick="forgeRune()" id="rune-button" disabled>
+                                    开始制作
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 鉴定功能 -->
+                    <div class="skill-panel">
+                        <h6>物品鉴定</h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="form-label">物品类型</label>
+                                <select class="form-control" id="identify-type">
+                                    <option value="equipment">装备</option>
+                                    <option value="treasure">法宝</option>
+                                    <option value="rune">符文</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">物品ID</label>
+                                <input type="number" class="form-control" id="identify-item-id" placeholder="输入物品ID">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">&nbsp;</label>
+                                <button class="btn btn-warning w-100" onclick="identifyItem()">
+                                    开始鉴定
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 采集功能 -->
+                    <div class="skill-panel">
+                        <h6>材料采集</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">选择材料</label>
+                                <select class="form-control" id="collect-material">
+                                    <!-- 材料选项将在这里动态生成 -->
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">采集数量</label>
+                                <input type="number" class="form-control" id="collect-quantity" value="1" min="1" max="10">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">&nbsp;</label>
+                                <button class="btn btn-success w-100" onclick="collectMaterials()">
+                                    开始采集
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 制作结果 -->
+                <div class="crafting-result" id="crafting-result" style="display: none;">
+                    <h6>制作结果</h6>
+                    <div id="result-content">
+                        <!-- 结果内容将在这里显示 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let lifeSkills = {};
+        let materials = [];
+
+        // 获取认证令牌
+        function getToken() {
+            return localStorage.getItem('token');
+        }
+
+        // API调用函数
+        async function apiCall(endpoint, options = {}) {
+            const token = getToken();
+            if (!token) {
+                alert('请先登录');
+                return null;
+            }
+
+            const defaultOptions = {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            const response = await fetch(endpoint, { ...defaultOptions, ...options });
+            if (response.status === 401) {
+                alert('认证失败，请重新登录');
+                return null;
+            }
+            return response.json();
+        }
+
+        // 加载生活技能
+        async function loadLifeSkills() {
+            const data = await apiCall('/life_skills');
+            if (data) {
+                lifeSkills = {};
+                data.skills.forEach(skill => {
+                    lifeSkills[skill.skill_type] = skill;
+                });
+                renderLifeSkills();
+            }
+        }
+
+        // 渲染生活技能
+        function renderLifeSkills() {
+            const container = document.getElementById('life-skills-list');
+            container.innerHTML = '';
+
+            const skillTypes = ['锻造', '炼丹', '符文', '鉴定', '采集', '种植'];
+            skillTypes.forEach(type => {
+                const skill = lifeSkills[type] || { level: 1, experience: 0, proficiency: 0 };
+                const expPercent = skill.experience ? (skill.experience % 100) : 0;
+
+                const skillDiv = document.createElement('div');
+                skillDiv.className = 'mb-3';
+                skillDiv.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <strong>${type}</strong>
+                        <span class="badge bg-primary">Lv.${skill.level}</span>
+                    </div>
+                    <div class="skill-progress">
+                        <div class="skill-progress-fill" style="width: ${expPercent}%"></div>
+                    </div>
+                    <small class="text-muted">熟练度: ${skill.proficiency}/100 | 经验: ${skill.experience}</small>
+                `;
+                container.appendChild(skillDiv);
+            });
+        }
+
+        // 初始化生活技能
+        async function initLifeSkills() {
+            const result = await apiCall('/life_skills/init', { method: 'POST' });
+            if (result) {
+                alert(result.message);
+                if (result.message.includes('successfully')) {
+                    loadLifeSkills();
+                }
+            }
+        }
+
+        // 加载材料列表
+        async function loadMaterials() {
+            const data = await apiCall('/materials');
+            if (data) {
+                materials = data.materials;
+                renderMaterialsSelect();
+                loadMaterialInventory();
+            }
+        }
+
+        // 渲染材料选择下拉框
+        function renderMaterialsSelect() {
+            const select = document.getElementById('collect-material');
+            select.innerHTML = '<option value="">选择材料</option>';
+
+            materials.forEach(material => {
+                const option = document.createElement('option');
+                option.value = material.id;
+                option.textContent = `${material.name} (${material.rarity})`;
+                select.appendChild(option);
+            });
+        }
+
+        // 加载材料库存
+        async function loadMaterialInventory() {
+            const data = await apiCall('/materials/inventory');
+            if (data) {
+                const container = document.getElementById('materials-inventory');
+                container.innerHTML = '';
+
+                if (data.inventory.length === 0) {
+                    container.innerHTML = '<p class="text-muted">暂无材料</p>';
+                    return;
+                }
+
+                data.inventory.forEach(item => {
+                    const materialDiv = document.createElement('div');
+                    materialDiv.className = `material-item ${getRarityClass(item.rarity)}`;
+                    materialDiv.innerHTML = `
+                        <strong>${item.name}</strong><br>
+                        <small>${item.type} × ${item.quantity}</small>
+                    `;
+                    container.appendChild(materialDiv);
+                });
+            }
+        }
+
+        // 获取稀有度样式类
+        function getRarityClass(rarity) {
+            const classes = {
+                '常见': '',
+                '稀有': 'rare',
+                '珍贵': 'epic',
+                '传说': 'legendary'
+            };
+            return classes[rarity] || '';
+        }
+
+        // 计算锻造成功率
+        async function calculateForgeSuccess() {
+            const materialQuality = parseFloat(document.getElementById('forge-material-quality').value);
+
+            const result = await apiCall('/life_skills/success_rate', {
+                method: 'POST',
+                body: JSON.stringify({
+                    skill_type: '锻造',
+                    material_quality_factor: materialQuality
+                })
+            });
+
+            if (result) {
+                const successRate = result.base_success_rate * 100;
+                document.getElementById('forge-success-display').style.display = 'block';
+                document.getElementById('forge-success-fill').style.width = `${successRate}%`;
+                document.getElementById('forge-success-text').textContent =
+                    `成功率: ${successRate.toFixed(1)}% (技能: ${(result.skill_coefficient * 100).toFixed(1)}%, 材料: ${(result.material_coefficient * 100).toFixed(1)}%, 悟性: ${(result.wuxing_coefficient * 100).toFixed(1)}%)`;
+
+                document.getElementById('forge-button').disabled = false;
+            }
+        }
+
+        // 开始锻造装备
+        async function forgeEquipment() {
+            const equipType = document.getElementById('equipment-type').value;
+            const quality = document.getElementById('equipment-quality').value;
+            const materialQuality = parseFloat(document.getElementById('forge-material-quality').value);
+
+            const result = await apiCall('/equipment/forge', {
+                method: 'POST',
+                body: JSON.stringify({
+                    type: equipType,
+                    quality: quality,
+                    material_quality_factor: materialQuality
+                })
+            });
+
+            if (result) {
+                showCraftingResult('锻造结果', result.message);
+                if (result.equipment) {
+                    showCraftingResult('新装备', `
+                        ${result.equipment.name} (${result.equipment.quality})<br>
+                        攻击: ${result.equipment.attack_bonus}<br>
+                        防御: ${result.equipment.defense_bonus}<br>
+                        生命: ${result.equipment.hp_bonus}
+                    `);
+                }
+            }
+        }
+
+        // 计算符文制作成功率
+        async function calculateRuneSuccess() {
+            const materialQuality = parseFloat(document.getElementById('rune-material-quality').value);
+
+            const result = await apiCall('/life_skills/success_rate', {
+                method: 'POST',
+                body: JSON.stringify({
+                    skill_type: '符文',
+                    material_quality_factor: materialQuality
+                })
+            });
+
+            if (result) {
+                const successRate = result.base_success_rate * 100;
+                document.getElementById('rune-success-display').style.display = 'block';
+                document.getElementById('rune-success-fill').style.width = `${successRate}%`;
+                document.getElementById('rune-success-text').textContent =
+                    `成功率: ${successRate.toFixed(1)}% (技能: ${(result.skill_coefficient * 100).toFixed(1)}%, 材料: ${(result.material_coefficient * 100).toFixed(1)}%, 悟性: ${(result.wuxing_coefficient * 100).toFixed(1)}%)`;
+
+                document.getElementById('rune-button').disabled = false;
+            }
+        }
+
+        // 开始制作符文
+        async function forgeRune() {
+            const name = document.getElementById('rune-name').value.trim();
+            const attributeType = document.getElementById('rune-attribute').value;
+            const attributeValue = parseInt(document.getElementById('rune-value').value);
+            const quality = document.getElementById('rune-quality').value;
+            const materialQuality = parseFloat(document.getElementById('rune-material-quality').value);
+
+            if (!name) {
+                alert('请输入符文名称');
+                return;
+            }
+
+            const result = await apiCall('/rune/forge', {
+                method: 'POST',
+                body: JSON.stringify({
+                    name: name,
+                    attribute_type: attributeType,
+                    attribute_value: attributeValue,
+                    quality: quality,
+                    material_quality_factor: materialQuality
+                })
+            });
+
+            if (result) {
+                showCraftingResult('符文制作结果', result.message);
+                if (result.rune_id) {
+                    showCraftingResult('新符文', `符文ID: ${result.rune_id}`);
+                }
+            }
+        }
+
+        // 鉴定物品
+        async function identifyItem() {
+            const itemType = document.getElementById('identify-type').value;
+            const itemId = parseInt(document.getElementById('identify-item-id').value);
+
+            if (!itemId) {
+                alert('请输入物品ID');
+                return;
+            }
+
+            const result = await apiCall('/identify', {
+                method: 'POST',
+                body: JSON.stringify({
+                    item_type: itemType,
+                    item_id: itemId
+                })
+            });
+
+            if (result) {
+                showCraftingResult('鉴定结果', result.message);
+                loadLifeSkills(); // 刷新技能等级
+            }
+        }
+
+        // 采集材料
+        async function collectMaterials() {
+            const materialId = document.getElementById('collect-material').value;
+            const quantity = parseInt(document.getElementById('collect-quantity').value);
+
+            if (!materialId) {
+                alert('请选择要采集的材料');
+                return;
+            }
+
+            const result = await apiCall('/materials/collect', {
+                method: 'POST',
+                body: JSON.stringify({
+                    material_id: parseInt(materialId),
+                    quantity: quantity
+                })
+            });
+
+            if (result) {
+                showCraftingResult('采集结果', result.message);
+                loadMaterialInventory(); // 刷新库存
+                loadLifeSkills(); // 刷新技能等级
+            }
+        }
+
+        // 显示制作结果
+        function showCraftingResult(title, content) {
+            const resultDiv = document.getElementById('crafting-result');
+            const contentDiv = document.getElementById('result-content');
+
+            resultDiv.style.display = 'block';
+            contentDiv.innerHTML = `<h6>${title}</h6><p>${content}</p>`;
+
+            // 自动隐藏结果
+            setTimeout(() => {
+                resultDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLifeSkills();
+            loadMaterials();
+        });
+    </script>
+</body>
+</html>

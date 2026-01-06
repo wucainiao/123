@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-soft" style="background:linear-gradient(90deg, rgba(11,18,32,0.9), rgba(7,26,47,0.9));">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">修仙世界</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">主页</a></li>
+                    <li class="nav-item"><a class="nav-link" href="home.html">游戏</a></li>
+                    <li class="nav-item"><a class="nav-link" href="lingzhi.html">灵植</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="app-wrap container mt-4">
+    <title>灵植系统 - 修仙游戏</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0">灵田管理</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="lingtian-list" class="row g-3">
+                            <!-- 灵田卡片将在这里动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">灵植操作</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success" onclick="initLingtians()">
+                                <i class="fas fa-seedling"></i> 初始化灵田
+                            </button>
+                            <button class="btn btn-primary" onclick="showPlantModal()">
+                                <i class="fas fa-spa"></i> 种植灵植
+                            </button>
+                            <button class="btn btn-warning" onclick="showCareModal()">
+                                <i class="fas fa-hand-holding-water"></i> 照顾灵植
+                            </button>
+                            <button class="btn btn-info" onclick="showHarvestModal()">
+                                <i class="fas fa-cut"></i> 收获灵植
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 灵植列表 -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="mb-0">我的灵植</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="lingzhi-list">
+                            <!-- 灵植列表将在这里显示 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 种植灵植模态框 -->
+    <div class="modal fade" id="plantModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">种植灵植</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">灵植名称</label>
+                        <input type="text" class="form-control" id="lingzhiName" placeholder="输入灵植名称">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">品质</label>
+                        <select class="form-control" id="lingzhiQuality">
+                            <option value="凡品">凡品</option>
+                            <option value="黄品">黄品</option>
+                            <option value="玄品">玄品</option>
+                            <option value="地品">地品</option>
+                            <option value="天品">天品</option>
+                            <option value="无上">无上</option>
+                        </select>
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>种植说明：</strong><br>
+                        - 不同品质灵植生长时间和变异概率不同<br>
+                        - 种植后需要耐心等待和精心照顾
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="plantLingzhi()">开始种植</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 照顾灵植模态框 -->
+    <div class="modal fade" id="careModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">照顾灵植</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">选择灵植</label>
+                        <select class="form-control" id="careLingzhiSelect">
+                            <option value="">请选择要照顾的灵植</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">照顾方式</label>
+                        <select class="form-control" id="careType">
+                            <option value="water">浇水</option>
+                            <option value="fertilizer">施肥</option>
+                            <option value="sunlight">晒太阳</option>
+                        </select>
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>照顾消耗：</strong>10 灵石<br>
+                        <small>良好的照顾可以提高变异概率</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-success" onclick="careLingzhi()">开始照顾</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 收获灵植模态框 -->
+    <div class="modal fade" id="harvestModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">收获灵植</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">选择成熟的灵植</label>
+                        <select class="form-control" id="harvestLingzhiSelect">
+                            <option value="">请选择要收获的灵植</option>
+                        </select>
+                    </div>
+                    <div class="alert alert-warning">
+                        <strong>收获奖励：</strong>基于品质和是否变异<br>
+                        <small>收获后灵植将被移除，奖励灵石</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" onclick="harvestLingzhi()">收获</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 获取认证令牌
+        function getToken() {
+            return localStorage.getItem('token');
+        }
+
+        // API调用函数
+        async function apiCall(endpoint, options = {}) {
+            const token = getToken();
+            if (!token) {
+                alert('请先登录');
+                return null;
+            }
+
+            const defaultOptions = {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            const response = await fetch(endpoint, { ...defaultOptions, ...options });
+            if (response.status === 401) {
+                alert('认证失败，请重新登录');
+                return null;
+            }
+            return response.json();
+        }
+
+        // 显示灵田列表
+        async function showLingtians() {
+            const data = await apiCall('/lingtian');
+            if (!data) return;
+
+            const lingtianList = document.getElementById('lingtian-list');
+            lingtianList.innerHTML = '';
+
+            data.lingtians.forEach(lt => {
+                const card = document.createElement('div');
+                card.className = 'col-md-4 mb-3';
+                let content = `
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">灵田 ${lt.slot}</h5>
+                            <p class="card-text">
+                                土壤品质: ${lt.soil_quality}<br>
+                                灌溉等级: ${lt.irrigation_level}<br>
+                                施肥等级: ${lt.fertilizer_level}<br>
+                `;
+
+                if (lt.is_occupied && lt.lingzhi) {
+                    const lz = lt.lingzhi;
+                    content += `
+                        种植: ${lz.name}<br>
+                        品质: <span class="badge bg-${getQualityColor(lz.quality)}">${lz.quality}</span><br>
+                        生长阶段: ${lz.growth_stage}<br>
+                        生长进度: ${lz.growth_progress.toFixed(1)}%<br>
+                        <div class="progress mt-2">
+                            <div class="progress-bar" style="width: ${lz.growth_progress}%"></div>
+                        </div>
+                    `;
+                } else {
+                    content += `<span class="text-muted">未种植</span>`;
+                }
+
+                content += `
+                        </p>
+                `;
+
+                if (lt.is_occupied && lt.lingzhi) {
+                    content += `
+                        <button class="btn btn-warning btn-sm me-1" onclick="careLingzhi(${lt.lingzhi.id})">照顾</button>
+                        <button class="btn btn-success btn-sm me-1" onclick="harvestLingzhi(${lt.lingzhi.id}, 'harvest')">收获</button>
+                        <button class="btn btn-info btn-sm" onclick="harvestLingzhi(${lt.lingzhi.id}, 'upgrade')">升级</button>
+                    `;
+                } else {
+                    content += `<button class="btn btn-primary btn-sm" onclick="plantLingzhi(${lt.id})">种植</button>`;
+                }
+
+                content += `
+                        </div>
+                    </div>
+                `;
+                card.innerHTML = content;
+                lingtianList.appendChild(card);
+            });
+        }
+
+        // 显示灵植列表
+        async function showLingzhis() {
+            const data = await apiCall('/lingzhi');
+            if (!data) return;
+
+            const lingzhiList = document.getElementById('lingzhi-list');
+            lingzhiList.innerHTML = '';
+
+            if (data.lingzhis.length === 0) {
+                lingzhiList.innerHTML = '<p class="text-muted">暂无灵植</p>';
+                return;
+            }
+
+            data.lingzhis.forEach(lz => {
+                const item = document.createElement('div');
+                item.className = 'mb-2 p-2 border rounded';
+                item.innerHTML = `
+                    <strong>${lz.name}</strong>
+                    <span class="badge bg-${getQualityColor(lz.quality)} ms-1">${lz.quality}</span>
+                    <span class="badge bg-secondary ms-1">Lv.${lz.level}</span>
+                    ${lz.has_mutated ? '<span class="badge bg-danger ms-1">变异</span>' : ''}
+                    <br>
+                    <small class="text-muted">
+                        阶段: ${lz.growth_stage} (${lz.growth_progress.toFixed(1)}%)
+                        ${lz.has_mutated ? `| 变异: ${lz.attribute_type} +${lz.attribute_value}` : ''}
+                    </small>
+                `;
+                lingzhiList.appendChild(item);
+            });
+        }
+
+        // 获取品质颜色
+        function getQualityColor(quality) {
+            const colors = {
+                '凡品': 'secondary',
+                '黄品': 'warning',
+                '玄品': 'info',
+                '地品': 'success',
+                '天品': 'primary',
+                '无上': 'danger'
+            };
+            return colors[quality] || 'secondary';
+        }
+
+        // 初始化灵田
+        async function initLingtians() {
+            const result = await apiCall('/lingtian/init', { method: 'POST' });
+            if (result) {
+                alert(result.message);
+                if (result.message.includes('successfully')) {
+                    showLingtians();
+                }
+            }
+        }
+
+        // 显示种植模态框
+        function showPlantModal() {
+            const modal = new bootstrap.Modal(document.getElementById('plantModal'));
+            modal.show();
+        }
+
+        // 种植灵植
+        async function plantLingzhi(lingtianId) {
+            const name = document.getElementById('lingzhiName').value.trim();
+            const quality = document.getElementById('lingzhiQuality').value;
+
+            if (!name) {
+                alert('请输入灵植名称');
+                return;
+            }
+
+            const result = await apiCall('/lingzhi/plant', {
+                method: 'POST',
+                body: JSON.stringify({ name, quality })
+            });
+
+            if (result) {
+                alert(result.message);
+                if (result.message.includes('Successfully')) {
+                    bootstrap.Modal.getInstance(document.getElementById('plantModal')).hide();
+                    document.getElementById('lingzhiName').value = '';
+                    showLingtians();
+                    showLingzhis();
+                }
+            }
+        }
+
+        // 显示照顾模态框
+        function showCareModal() {
+            showLingzhis();
+            const modal = new bootstrap.Modal(document.getElementById('careModal'));
+            modal.show();
+        }
+
+        // 照顾灵植
+        async function careLingzhi(lingzhiId) {
+            const careType = document.getElementById('careType').value;
+
+            const result = await apiCall(`/lingzhi/care/${lingzhiId}`, {
+                method: 'POST',
+                body: JSON.stringify({ type: careType })
+            });
+
+            if (result) {
+                alert(result.message);
+                if (result.message.includes('Successfully')) {
+                    bootstrap.Modal.getInstance(document.getElementById('careModal')).hide();
+                    showLingtians();
+                    showLingzhis();
+                }
+            }
+        }
+
+        // 显示收获模态框
+        function showHarvestModal() {
+            showLingzhis();
+            const modal = new bootstrap.Modal(document.getElementById('harvestModal'));
+            modal.show();
+        }
+
+        // 收获灵植
+        async function harvestLingzhi(lingzhiId, action) {
+            const result = await apiCall(`/lingzhi/harvest/${lingzhiId}`, {
+                method: 'POST',
+                body: JSON.stringify({ action })
+            });
+
+            if (result) {
+                alert(result.message);
+                if (result.message.includes('Successfully')) {
+                    bootstrap.Modal.getInstance(document.getElementById('harvestModal')).hide();
+                    showLingtians();
+                    showLingzhis();
+                }
+            }
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            showLingtians();
+            showLingzhis();
+        });
+    </script>
+</body>
+</html>
